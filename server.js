@@ -1,10 +1,10 @@
 const express = require("express");
 const http = require("http");
-const socketIO = require("socket.io");
+const socketIo = require("socket.io");
 
 const app = express();
 const server = http.createServer(app);
-const io = socketIO(server);
+const io = socketIo(server);
 
 app.get("/", (req, res) => {
   res.sendFile(__dirname + "/index.html");
@@ -13,8 +13,8 @@ app.get("/", (req, res) => {
 io.on("connection", (socket) => {
   console.log("A user connected");
 
-  socket.on("chat message", (msg) => {
-    io.emit("chat message", msg);
+  socket.on("chat message", (data) => {
+    io.emit("chat message", data); // Broadcast the message to all connected clients
   });
 
   socket.on("disconnect", () => {
@@ -22,7 +22,6 @@ io.on("connection", (socket) => {
   });
 });
 
-const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+server.listen(3000, () => {
+  console.log("Server is running on http://localhost:3000");
 });

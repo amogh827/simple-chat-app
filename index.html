@@ -1,29 +1,139 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <title>Socket.io Chat App</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chat Application</title>
+    <style>
+      /* Reset default margin and padding */
+      body,
+      h1,
+      h2,
+      h3,
+      p,
+      ul,
+      li {
+        margin: 0;
+        padding: 0;
+      }
+
+      /* Basic styling */
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f2f2f2;
+      }
+
+      .chat-container {
+        max-width: 600px;
+        margin: 50px auto;
+        background-color: #ffffff;
+        border: 1px solid #ccc;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .chat-header {
+        background-color: #075e54;
+        color: #ffffff;
+        padding: 10px;
+        text-align: center;
+        font-size: 18px;
+      }
+
+      .chat-messages {
+        padding: 20px;
+        max-height: 400px;
+        overflow-y: auto;
+      }
+
+      .message {
+        padding: 10px;
+        margin: 10px;
+        border-radius: 5px;
+      }
+
+      .incoming {
+        background-color: #e1ffc7;
+      }
+
+      .outgoing {
+        background-color: #dcf8c6;
+        align-self: flex-end;
+      }
+
+      .chat-input {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        border-top: 1px solid #ccc;
+      }
+
+      .chat-input input {
+        flex: 1;
+        padding: 8px;
+        border: none;
+        border-radius: 5px;
+      }
+
+      .chat-input button {
+        padding: 8px 15px;
+        background-color: #075e54;
+        color: #ffffff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      /* Responsive design */
+      @media (max-width: 768px) {
+        .chat-container {
+          margin: 20px;
+        }
+      }
+    </style>
   </head>
   <body>
-    <ul id="messages"></ul>
-    <form id="form" action="">
-      <input id="input" autocomplete="off" /><button>Send</button>
-    </form>
-
+    <div class="chat-container">
+      <div class="chat-header">WhatsApp Chat</div>
+      <div class="chat-messages">
+        <div class="message incoming">Hello there!</div>
+        <div class="message outgoing">Hi! How can I help you?</div>
+      </div>
+      <div class="chat-input">
+        <input type="text" placeholder="Type your message..." id="chatInput" />
+        <button id="sendButton">Send</button>
+      </div>
+    </div>
     <script src="/socket.io/socket.io.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-      $(document).ready(function () {
-        const socket = io();
+      const socket = io.connect(
+        "https://3000-amogh827-simplechatapp-yoogwfgldk4.ws-us104.gitpod.io/"
+      );
 
-        $("form").submit(function () {
-          socket.emit("chat message", $("#input").val());
-          $("#input").val("");
-          return false;
-        });
+      const emojiMap = {
+        react: "📖", //could not find the emoji
+        woah: "😮",
+        hey: "✋", //could not find the emoji
+        lol: "😂",
+        like: "🤍",
+        congratulations: "🎉",
+      };
 
-        socket.on("chat message", function (msg) {
-          $("#messages").append($("<li>").text(msg));
-        });
+      document.getElementById("sendButton").addEventListener("click", () => {
+        const messageEle = document.getElementById("chatInput");
+        let message = messageEle.value;
+        for (const txt of Object.keys(emojiMap)) {
+          message = message.replace(txt, emojiMap[txt]);
+        }
+        messageEle.value = "";
+        socket.emit("chat message", message);
+      });
+      socket.on("chat message", (msg) => {
+        const messageDiv = document.querySelector(".chat-messages");
+        const newMessageDiv = document.createElement("div");
+        newMessageDiv.className = "message incoming";
+        newMessageDiv.textContent = msg;
+        messageDiv.appendChild(newMessageDiv);
       });
     </script>
   </body>
